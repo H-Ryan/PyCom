@@ -1,7 +1,7 @@
 # Building an indoor Air Quality Monitor 
 
 
-###### Authors: `Elias Lindfors (el224tn) & Hamed Talebi (ht222jp)`
+###### [**The Same Page in Hackmd Format**](https://hackmd.io/@ryantal/Ski0EZVAd)
 ###### tags: `IoT` `LoRa` `MQTT` `SSL` `TIG Stack`
 
 This tutorial presents the steps required to make your indoor air quality monitor. It shows how to gather sensor information like; temperature, humidity, and CO2 from your environment and store them on the cloud, and finally using visualization analytics web application to monitor updates and changes.
@@ -21,12 +21,12 @@ In this project, we plan to consider the effect of temperature and humidity leve
 The following materials used in this project:
 
 
-| Hardware                  | Price and link          |
+ Hardware                  | Price and link          |
 | ------------------------- |:----------------------- |
-| ![](https://alepycom.gitbooks.io/pycom-docs/content/img/lopy4.png =130x)LoPy4 Basic bundle (Two sets for LoRa Gateway and Node)        | [849 SEK](https://www.electrokit.com/produkt/lnu-1dt305-tillampad-iot-lopy4-basic-bundle/ "ElectroKit")   |
-| ![](https://www.mysensors.org/uploads/57c3ec0c4d04abe84cd93e0f/image/dht11.png =100x)DHT11 moisture sensor     | [49 SEK](https://www.electrokit.com/produkt/digital-temperatur-och-fuktsensor-dht11/ "ElectroKit")     |
-| ![](https://cdn.shopify.com/s/files/1/0410/7888/2465/products/eff1b1c386c3409c8cc2d4028f4de147674a39b49867770537045b44d6e1ba2d.png?v=1600968764 =100x)DHT22 moisture sensor     | [99 SEK](https://www.electrokit.com/produkt/temp-fuktsensor-rht03/ "ElectroKit")     |
-| ![](https://www.joy-it.net/files/files/Produkte/SEN-CCS811V1/SEN-CCS811V1-01g.png =100x)CCS811 Air Quality sensor | [140 SEK](https://www.amazon.se/KEYESTUDIO-luftkvalitetssensor-kolmonoxid-luftkvalitet-gasgivare/dp/B08GP947QS/ref=sr_1_1?dchild=1&keywords=ccs811&qid=1626980467&sr=8-1 "Amazon SE")     |
+| <img src="https://i.imgur.com/qve98iK.png" width="15%" height="15%"> LoPy4 Basic bundle (Two sets for LoRa Gateway and Node)        | [849 SEK](https://www.electrokit.com/produkt/lnu-1dt305-tillampad-iot-lopy4-basic-bundle/ "ElectroKit")   |
+| <img src="https://i.imgur.com/Z24iU3F.png" width="15%" height="15%">   DHT11 moisture sensor     | [49 SEK](https://www.electrokit.com/produkt/digital-temperatur-och-fuktsensor-dht11/ "ElectroKit")     |
+| <img src="https://i.imgur.com/Z3sDGJA.png" width="15%" height="15%"> DHT22 moisture sensor     | [99 SEK](https://www.electrokit.com/produkt/temp-fuktsensor-rht03/ "ElectroKit")     |
+| <img src="https://i.imgur.com/fh0R3VD.png" width="15%" height="15%"> CCS811 Air Quality sensor | [140 SEK](https://www.amazon.se/KEYESTUDIO-luftkvalitetssensor-kolmonoxid-luftkvalitet-gasgivare/dp/B08GP947QS/ref=sr_1_1?dchild=1&keywords=ccs811&qid=1626980467&sr=8-1 "Amazon SE")     |
 | Cloud Server Renting (Ubuntu 18 installed on Digital Ocean)| [112 SEK/month](https://digitalocean.com "DigitalOcean") |
 | Cloud Server Renting (CentOS 7 installed on Hetzner)| [40 SEK/month](https://www.hetzner.com/cloud "Hetzner") |
 
@@ -49,20 +49,20 @@ We used Visual Studio Code with Pymakr to easily connect the Lopy4 device over U
 
 * Connect the Pycom device to its Expansion Board by having the rgbLED towards the USB connector, align the pins, and press firmly. Connect the included micro-USB cable to the Expansion Board and Computer.
 * In VSCode, install the Pymakr extension by going to the Extensions tab and searching for ‘Pymakr’
-![](https://i.imgur.com/mJEvvuw.png)
+![](https://i.imgur.com/lwZlTI0.png)
 
 * Once installed you should have these extra options on the blue bottom bar, as well as a new REPL terminal. From here you can upload/download your project files, and run the currently open file.
-![](https://i.imgur.com/ScBbohM.png)
+![](https://i.imgur.com/usKongh.png)
 
-* After we finish coding we can upload the code to the board from here, or the top right corner. ![](https://i.imgur.com/2SljOpq.jpg) 
+* After we finish coding we can upload the code to the board from here, or the top right corner. ![](https://i.imgur.com/NPQ5abQ.jpg) 
 
 * **Note:** You can see all commands by clicking “All commands” at the bottom, or pressing ctrl+shift+P and entering `Pymakr`
-![](https://i.imgur.com/XLpADvq.png)
+![](https://i.imgur.com/9eSlnQK.png)
  
 <br/>
 
 **An alternative route** to uploading files is to transfer them over FTP by making sure your Pycom-device is connected to the local Wifi. Run the following commands over on the REPL-terminal:
-```python=1
+```python
 Import machine
 Import pycom
 From network import WLAN
@@ -76,7 +76,7 @@ Then connect to it with an FTP client application like [**WinSCP**](https://wins
 
 ## Putting everything together
 The hardware has been connected together on a Breadboard with jumper-wire like this:
-![](https://i.imgur.com/ORLQyE1.png)
+![](https://i.imgur.com/fGkIxFn.png)
 
 <br/>
 
@@ -125,7 +125,7 @@ As it showed in [**Putting everything together**](#Putting-everything-together),
 ### Node
 An air quality sensor (**CCS811**) and two temperature and humidity sensors (**DHT11** & **DHT22**) are connected to the LoPy4 to form a node. The node is responsible to read the value of the sensors and send it to the gateway. Our nodes try to read sensors’ value ten times and get the reading average every five minutes (for testing, better to read every 15-20 minutes) then use low power **LoRa** communication protocol to send it to the gateway. It tries to send the values three times, and each time listens for gateway acknowledgment. If it receives the “ack” package it goes to sleep for five minutes, otherwise it goes to sleep for two minutes and tries to send data again. We used two libraries for our sensors [“CCS811.py”](https://github.com/Ryan-HT/air-quality-lnu-project/blob/main/Node_Files/lib/CCS811.py) and [“dht.py”](https://github.com/Ryan-HT/air-quality-lnu-project/blob/main/Node_Files/lib/dht.py) and give the link to the source in our code.
 Our node use `struct` to pack sensors data to send over LoRa in the following format:
-```python=-
+```python
 # deviceId+lastMessageRandomId+indoorTemperature+indoorHumidity+outdoorTemperature+outdoorHumidity+eCO2+eTVOC
 # lastMessageRandomId control message duplication at gateway side
 _LORA_PKG_FORMAT = "!BBffffff"
@@ -170,15 +170,14 @@ The Server runs Eclipse Mosquitto to receive the data sent over MQTT. Mosquitto 
 To generate working certificates and keys you need to sign them, either yourself or by a Certificate Authority. We will create our own Certificate Authority that will sign the Server and Client certificates and keys. Thereby only we can create new Certificates.
 
 Make sure to install the tools needed with `sudo apt-get install gnutls-bin` (**On Ubuntu**) or `sudo yum install gnutls-utils` (**On CentOS**)
-Now we generate our Certificate Authority with these two commands:
-:::warning
-Ubuntu and CentOS
-```shell=1
+Now we generate our Certificate Authority with these two commands:  
+```diff
+! Ubuntu and CentOS
+
 sudo certtool --generate-privkey --outfile CA-key.pem
 sudo chmod 400 CA-key.pem
 sudo certtool --generate-self-signed --load-privkey CA-key.pem --outfile CA.pem
 ```
-:::
 
 You will need to fill out a form after running the second command. Some of the options can be left blank, but it is important you choose a Common name and an expiration date far into the future, and select YES on these three options:
 - Does the certificate belong to an authority
@@ -186,14 +185,14 @@ You will need to fill out a form after running the second command. Some of the o
 - Will the certificate be used to sign CRLs
 
 #### Generating a server certificate signed by out new authority
-:::warning
-Ubuntu and CentOS
-```shell=4
+```diff
+! Ubuntu and CentOS
+
 sudo certtool --generate-privkey --outfile server-key.pem --bits 2048
 sudo certtool --generate-request --load-privkey server-key.pem --outfile server-request.pem
 sudo certtool --generate-certificate --load-request server-request.pem --outfile server-cert.pem --load-ca-certificate CA.pem --load-ca-privkey CA-key.pem
 ```
-:::
+
 
 Here it is important you pick a date far into the future, the correct dnsName, and select YES for
 - Is this a TLS web client certificate
@@ -203,14 +202,14 @@ The dnsName is the same as the hostname for the Application it will be used for.
 
 #### Generating a Client Certificate signed by our new authority
 
-:::warning
-Ubuntu and CentOS
-```shell=7
+```diff
+! Ubuntu and CentOS
+
 sudo certtool --generate-privkey --outfile client-key.pem --bits 2048
 sudo certtool --generate-request --load-privkey client-key.pem --outfile client-request.pem
 sudo certtool --generate-certificate --load-request client-request.pem --outfile client-cert.pem --load-ca-certificate CA.pem --load-ca-privkey CA-key.pem
 ```
-:::
+
 
 Here you also enter an expiration date far into the future and answer YES to these two questions
 - Is this a TLS web client certificate
@@ -227,48 +226,48 @@ The `CA.key`, `server-key.pem` and `client-key.pem` are private-keys and need to
 A reference-guide can be found [**here (Ubuntu)**](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-the-mosquitto-mqtt-messaging-broker-on-ubuntu-18-04) and [**here (CentOS)**](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-the-mosquitto-mqtt-messaging-broker-on-centos-7). Here's the steps as well:
 
 #### Installing Mosquitto
-:::info
-Ubuntu
-```shell=1
+```diff
+! Ubuntu
+
 sudo apt install mosquitto mosquitto-clients
 ```
-:::
-:::success
-CentOS
-```shell=1
+
+```diff
+! CentOS
+
 sudo yum -y install epel-release
 sudo yum -y install mosquitto
 ```
-:::
+
 
 (optional) We generate a usename and enter the password after with
-:::info
-Ubuntu
-```shell=2
+```diff
+! Ubuntu
+
 sudo mosquitto_passwd -c /etc/mosquitto/passwd <username>
 ```
-:::
-:::success
-CentOS
-```shell=3
+
+```diff
+! CentOS
+
 sudo mosquitto_passwd  -c /etc/mosquitto/passwd admin
 sudo mosquitto_passwd  /etc/mosquitto/passwd <username>  #pass: <password>
 ```
-:::
 
-Then we edit the `default.conf` file with
-:::info
-Ubuntu
-```shell=3
+
+Then we edit the `default config` file with
+```diff
+! Ubuntu
+
 sudo nano /etc/mosquitto/conf.d/default.conf
 ```
-:::
-:::success
-CentOS
-```shell=5
+
+```diff
+! CentOS
+
 sudo nano /etc/mosquitto/mosquitto.conf
 ```
-:::
+
 and enter the following to end of config file:
 ```
 allow_anonymous false
@@ -282,32 +281,33 @@ keyfile /etc/mosquitto/cert/server-key.pem
 require_certificate true
 ```
 Once saved, we restart Mosquitto for the changes to take effect
-:::info
-Ubuntu
-```shell=4
+```diff
+! Ubuntu
+
 sudo systemctl restart mosquitto
 ```
-:::
-:::success
-CentOS
-```shell=6
+
+```diff
+! CentOS
+
 sudo service mosquitto start
 sudo systemctl enable mosquitto
 ```
-:::
+
 
 
 ## Presenting the data
 We utilize TIG Stack to collect, store, and visualize the data. TIG is short for Telegraf, InfluxDB, and Grafana. Telegraf is used to capture the MQTT data, InfluxDB stores the data, and Grafana visualizes the data. The data comes in every five minutes (for testing and better to be every twenty minutes to save energy on the sensor node) so our Dashboard and queries update accordingly.
 
-![](https://myvmworld.fr/wp-content/uploads/2017/12/telegraf.png =100x)
+<img src="https://i.imgur.com/CtmiQoG.png" width="15%" height="15%">
 Telegraf can read from one or multiple inputs, in our case MQTT, and send the results back to outputs, like InfluxDB. It is a great “middleman” application for gathering data and sending it to where it needs to go in case you have multiple input sources and output destinations.
 
-![](https://dbdb.io/media/logos/InfluxDB.png =100x)
+<img src="https://i.imgur.com/tceyts1.png" width="15%" height="15%">
 InfluxDB is more or less an SQL database but with Time-Series data in mind, where it always saves the current time when inserting data. We chose InfluxDB as it’s quick and easy to set up and fits IoT purposes very well, especially in a Docker container.
 
-![](https://stitch-microverse.s3.amazonaws.com/uploads/domains/grafana-logo.png =100x)
+<img src="https://i.imgur.com/7Qa8GKs.png" width="15%" height="15%">
 Grafana is the visualization part of the TIG Stack. It has multiple plugins for visualizing your data the way you want it. For example Time Series, charts, tables, and graphs. Triggers/Alerts can be set up where if a goal is met then something triggers. It can be something like alerting on the Dashboard when an error is sent from the Pycom-device, or if a value from one of the sensors passes a set threshold then a Webhook message is sent.
+
 ### Installing TIG stack on Ubuntu or CentOS
 Install Docker with [these instructions for Ubuntu](https://docs.docker.com/engine/install/ubuntu/) or [these instructions for CentOS](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-centos-7).
 Install Docker-compose with [these instructions for Ubuntu](https://docs.docker.com/compose/install/ ) or [these instructions for CentOS](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-centos-7.amp).
@@ -350,12 +350,9 @@ Outdoor Sensor		|	Outdoor Sensor
 :-------------------------:	|	:-------------------------:
 ![](https://i.imgur.com/pMdQW7C.jpg)  	|	![](https://i.imgur.com/KBgwIrm.jpg)
 
-Sensor Node		|	Sensor Node
-:-------------------------:	|	:-------------------------:
-![](https://i.imgur.com/lcEXFck.png =1000x) | ![](https://i.imgur.com/SDASRxf.png =1000x)
- 
+
 And some images of Dashboard examples:
-![](https://i.imgur.com/HWnLag6.png)
+![](https://i.imgur.com/oLx0xfo.png)
 
 ![](https://i.imgur.com/Iwle1Vl.jpg)
 
@@ -372,38 +369,3 @@ We reached most of our initial goals in this project. We have managed to make a 
  
 ### Analyzing Data
 The next step would be using a suitable data analyzer like some machine learning algorithm to help us conclude the reasoning of the phenomenon.
-
-<style>
-
-.markdown-body code{
-    font-size: 1em !important;
-}
-.markdown-body .a{
-    font-size: 5em !important;
-}
-.markdown-body pre {
-    background-color: #333;
-    border: 1px solid #333 !important;
-    color: #dfdfdf;
-    font-weight: 600;
-}
-.token.operator, .token.entity,
-.token.url, .language-css .token.string,
-.style .token.string {
-    background: #000;
-}
-.markdown-body table {
-    display: table;
-    padding: 1em;
-    width: 100%;
-}
-.markdown-body table th,
-.markdown-body table td,
-.markdown-body table tr {
-    border: none !important;
-}
-.markdown-body table tr {
-    background-color: transparent !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
-}
-</style>
